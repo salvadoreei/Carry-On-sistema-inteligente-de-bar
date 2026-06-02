@@ -1,0 +1,24 @@
+﻿<?xml version="1.0" encoding="UTF-8" ?>
+<Application xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             xmlns:local="clr-namespace:BarPedidos"
+             xmlns:converters="clr-namespace:BarPedidos.Converters"
+             x:Class="BarPedidos.App">
+    <Application.Resources>
+        <ResourceDictionary>
+            <!-- Importa estilos globais da aplicação -->
+            <!-- Colors.xaml e Styles.xaml contêm definições de cores e estilos reutilizáveis -->
+            <ResourceDictionary.MergedDictionaries>
+                <ResourceDictionary Source="Resources/Styles/Colors.xaml" />
+                <ResourceDictionary Source="Resources/Styles/Styles.xaml" />
+            </ResourceDictionary.MergedDictionaries>
+
+            <!-- Registo global de Converters -->
+            <!-- Registados aqui para serem acessíveis em todas as páginas sem repetir código -->
+            <!-- InvertedBoolConverter: inverte booleanos (usado em IsVisible) -->
+            <converters:InvertedBoolConverter x:Key="InvertedBoolConverter"/>
+            <!-- StatusPendenteConverter: verifica se pedido está pendente (botão cancelar) -->
+            <converters:StatusPendenteConverter x:Key="StatusPendenteConverter"/>
+        </ResourceDictionary>
+    </Application.Resources>
+</Application>

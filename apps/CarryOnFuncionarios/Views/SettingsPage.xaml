@@ -1,0 +1,89 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             x:Class="BarPedidosFuncionarios.Views.SettingsPage"
+             Title="">
+
+    <!-- Padding extra no topo para Android evitar sobreposição com barra do sistema -->
+    <ContentPage.Padding>
+        <OnPlatform x:TypeArguments="Thickness">
+            <On Platform="Android" Value="0,15,0,0" />
+        </OnPlatform>
+    </ContentPage.Padding>
+
+    <ScrollView>
+        <StackLayout Padding="16" Spacing="20">
+
+            <!-- HEADER DA PÁGINA -->
+            <Frame Style="{StaticResource CardStyle}" Padding="20">
+                <StackLayout Spacing="8">
+                    <Label Text="Definições"
+                           FontSize="28"
+                           FontAttributes="Bold"
+                           TextColor="{DynamicResource TextPrimary}"
+                           HorizontalOptions="Center"/>
+                    <Label Text="Personalize a sua experiência"
+                           FontSize="14"
+                           TextColor="{DynamicResource TextSecondary}"
+                           HorizontalOptions="Center"/>
+                </StackLayout>
+            </Frame>
+
+            <!-- SEÇÃO APARÊNCIA (TEMA CLARO/ESCURO) -->
+            <Frame Style="{StaticResource CardStyle}" Padding="20">
+                <StackLayout Spacing="16">
+
+                    <Label Text="Aparência"
+                           FontSize="20"
+                           FontAttributes="Bold"
+                           TextColor="{DynamicResource TextPrimary}"/>
+
+                    <BoxView HeightRequest="1"
+                             Color="{DynamicResource BorderColor}"/>
+
+                    <!-- OPÇÃO TEMA ESCURO -->
+                    <Grid ColumnDefinitions="*,Auto" ColumnSpacing="12">
+                        <StackLayout Grid.Column="0" VerticalOptions="Center">
+                            <Label Text="Tema Escuro"
+                                   FontSize="16"
+                                   FontAttributes="Bold"
+                                   TextColor="{DynamicResource TextPrimary}"/>
+                            <Label Text="Ativar modo escuro"
+                                   FontSize="13"
+                                   TextColor="{DynamicResource TextSecondary}"/>
+                        </StackLayout>
+
+                        <!-- Switch para alternar entre tema claro e escuro -->
+                        <!-- Frame exterior dá visual estilizado ao switch -->
+                        <Frame Grid.Column="1"
+                               Padding="0"
+                               CornerRadius="16"
+                               HasShadow="False"
+                               BorderColor="Transparent"
+                               WidthRequest="51"
+                               HeightRequest="31"
+                               VerticalOptions="Center"
+                               HorizontalOptions="End">
+                            <!-- Cor de fundo adapta-se ao tema atual -->
+                            <Frame.BackgroundColor>
+                                <AppThemeBinding Light="#CBD5E1" Dark="#475569"/>
+                            </Frame.BackgroundColor>
+
+                            <!-- Switch ligado à propriedade IsDarkMode no ViewModel -->
+                            <!-- Mudança chama SetTheme() no ThemeService -->
+                            <Switch IsToggled="{Binding IsDarkMode}"
+                                    OnColor="{StaticResource Primary}"
+                                    ThumbColor="White"
+                                    BackgroundColor="Transparent"
+                                    VerticalOptions="Center"
+                                    HorizontalOptions="Center"
+                                    Scale="0.85"/>
+                        </Frame>
+                    </Grid>
+
+                </StackLayout>
+            </Frame>
+
+        </StackLayout>
+    </ScrollView>
+</ContentPage>

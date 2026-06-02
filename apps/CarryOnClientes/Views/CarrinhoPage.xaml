@@ -1,0 +1,224 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             xmlns:vm="clr-namespace:BarPedidos.ViewModels"
+             xmlns:models="clr-namespace:BarPedidos.Models"
+             x:Class="BarPedidos.Views.CarrinhoPage"
+             Title="">
+
+    <!-- Padding extra no topo para Android evitar sobreposição com barra do sistema -->
+    <ContentPage.Padding>
+        <OnPlatform x:TypeArguments="Thickness">
+            <On Platform="Android" Value="0,15,0,0" />
+        </OnPlatform>
+    </ContentPage.Padding>
+
+    <ScrollView>
+        <StackLayout Padding="16,0,16,16" Spacing="16">
+
+            <!-- Seção de informações do pedido (mesa e observações) -->
+            <!-- Usa InvertedBoolConverter: só aparece quando CarrinhoVazio = false -->
+            <Frame Style="{StaticResource CardStyle}"
+                   IsVisible="{Binding CarrinhoVazio, Converter={StaticResource InvertedBoolConverter}}">
+                <StackLayout Spacing="12">
+
+                    <Label Text="Informações do Pedido" 
+                           FontSize="20" 
+                           FontAttributes="Bold"
+                           TextColor="{DynamicResource TextPrimary}"/>
+
+                    <!-- Campo para número da mesa -->
+                    <!-- Teclado numérico para facilitar entrada -->
+                    <Frame Padding="12"
+                           CornerRadius="10"
+                           HasShadow="False"
+                           BorderColor="{DynamicResource BorderColor}">
+                        <!-- Cor de fundo -->
+                        <Frame.BackgroundColor>
+                            <AppThemeBinding Light="#F1F5F9" Dark="#1E293B"/>
+                        </Frame.BackgroundColor>
+                        <Entry Placeholder="Número da mesa (ex: 5)"
+                               Keyboard="Numeric"
+                               Text="{Binding NumeroMesaTexto}"
+                               TextColor="{DynamicResource TextPrimary}"
+                               BackgroundColor="Transparent"
+                               PlaceholderColor="{DynamicResource TextSecondary}"/>
+                    </Frame>
+
+                    <!-- Campo para observações opcionais do pedido -->
+                    <Frame Padding="12"
+                           CornerRadius="10"
+                           HasShadow="False"
+                           BorderColor="{DynamicResource BorderColor}">
+                        <Frame.BackgroundColor>
+                            <AppThemeBinding Light="#F1F5F9" Dark="#1E293B"/>
+                        </Frame.BackgroundColor>
+                        <Editor Placeholder="Observações (opcional)"
+                                Text="{Binding ObservacoesPedido}"
+                                TextColor="{DynamicResource TextPrimary}"
+                                BackgroundColor="Transparent"
+                                PlaceholderColor="{DynamicResource TextSecondary}"/>
+                    </Frame>
+
+                </StackLayout>
+            </Frame>
+
+            <Label Text="Itens do Pedido" 
+                   FontSize="20" 
+                   FontAttributes="Bold"
+                   TextColor="{DynamicResource TextPrimary}"
+                   Margin="4,8,0,0"
+                   IsVisible="{Binding CarrinhoVazio, Converter={StaticResource InvertedBoolConverter}}"/>
+
+            <!-- Lista de itens no carrinho -->
+            <!-- Ligada à ObservableCollection ItensCarrinho do ViewModel -->
+            <CollectionView ItemsSource="{Binding ItensCarrinho}"
+                            IsVisible="{Binding CarrinhoVazio, Converter={StaticResource InvertedBoolConverter}}">
+                <CollectionView.ItemTemplate>
+                    <DataTemplate x:DataType="models:ItemCarrinho">
+                        <Frame Style="{StaticResource CardStyle}">
+                            <Grid RowDefinitions="Auto,Auto,Auto" RowSpacing="12">
+
+                                <!-- Nome do produto -->
+                                <Label Grid.Row="0"
+                                       Text="{Binding Produto.Nome}"
+                                       FontSize="18"
+                                       FontAttributes="Bold"
+                                       TextColor="{DynamicResource TextPrimary}"/>
+
+                                <!-- Controlos de quantidade (+/-) -->
+                                <!-- RelativeSource vai buscar Commands ao ViewModel (CarrinhoViewModel) -->
+                                <Grid Grid.Row="1"
+                                      ColumnDefinitions="Auto,Auto,Auto"
+                                      ColumnSpacing="16"
+                                      HorizontalOptions="Start">
+
+                                    <!-- Botão diminuir quantidade -->
+                                    <Button Grid.Column="0"
+                                            Text="−"
+                                            Command="{Binding Source={RelativeSource AncestorType={x:Type vm:CarrinhoViewModel}}, Path=DiminuirQuantidadeCommand}"
+                                            CommandParameter="{Binding .}"
+                                            WidthRequest="44"
+                                            HeightRequest="44"
+                                            CornerRadius="22"
+                                            BackgroundColor="{DynamicResource LightBorder}"
+                                            TextColor="{DynamicResource TextPrimary}"
+                                            FontSize="24"
+                                            FontAttributes="Bold"
+                                            Padding="0"/>
+
+                                    <!-- Label com a quantidade atual -->
+                                    <Label Grid.Column="1"
+                                           Text="{Binding Quantidade}"
+                                           FontSize="20"
+                                           FontAttributes="Bold"
+                                           VerticalOptions="Center"
+                                           WidthRequest="44"
+                                           HorizontalTextAlignment="Center"
+                                           TextColor="{DynamicResource TextPrimary}"/>
+
+                                    <!-- Botão aumentar quantidade -->
+                                    <Button Grid.Column="2"
+                                            Text="+"
+                                            Command="{Binding Source={RelativeSource AncestorType={x:Type vm:CarrinhoViewModel}}, Path=AumentarQuantidadeCommand}"
+                                            CommandParameter="{Binding .}"
+                                            WidthRequest="44"
+                                            HeightRequest="44"
+                                            CornerRadius="22"
+                                            BackgroundColor="{StaticResource Primary}"
+                                            TextColor="White"
+                                            FontSize="24"
+                                            FontAttributes="Bold"
+                                            Padding="0"/>
+
+                                </Grid>
+
+                                <!-- Linha com subtotal e botão remover -->
+                                <Grid Grid.Row="2"
+                                      ColumnDefinitions="*,Auto"
+                                      ColumnSpacing="12">
+
+                                    <!-- Subtotal calculado automaticamente no Model (Preço * Quantidade) -->
+                                    <Label Grid.Column="0"
+                                           Text="{Binding Subtotal, StringFormat='Subtotal: €{0:F2}'}"
+                                           FontSize="18"
+                                           FontAttributes="Bold"
+                                           VerticalOptions="Center">
+                                        <!-- Cor do preço adapta-se ao tema -->
+                                        <Label.TextColor>
+                                            <AppThemeBinding Light="{StaticResource PriceColor}"
+                                                             Dark="{StaticResource PriceColorDark}" />
+                                        </Label.TextColor>
+                                    </Label>
+
+                                    <!-- Botão para remover item do carrinho -->
+                                    <Button Grid.Column="1"
+                                            Text="Remover"
+                                            Command="{Binding Source={RelativeSource AncestorType={x:Type vm:CarrinhoViewModel}}, Path=RemoverItemCommand}"
+                                            CommandParameter="{Binding .}"
+                                            Style="{StaticResource DangerButton}"
+                                            CornerRadius="20"
+                                            Padding="16,8"/>
+
+                                </Grid>
+                            </Grid>
+                        </Frame>
+                    </DataTemplate>
+                </CollectionView.ItemTemplate>
+            </CollectionView>
+
+            <!-- Mensagem quando carrinho está vazio -->
+            <!-- x:Name permite aceder a este elemento no code-behind para animações -->
+            <StackLayout x:Name="CarrinhoEmptyView" 
+                         Padding="40,80" 
+                         VerticalOptions="CenterAndExpand"
+                         IsVisible="{Binding CarrinhoVazio}">
+                <Label Text="O carrinho está vazio"
+                       FontSize="24"
+                       FontAttributes="Bold"
+                       TextColor="{DynamicResource TextPrimary}"
+                       HorizontalOptions="Center"
+                       Margin="0,20,0,8"/>
+                <Label Text="Adicione produtos do menu para começar."
+                       FontSize="16"
+                       TextColor="{DynamicResource TextSecondary}"
+                       HorizontalOptions="Center"
+                       HorizontalTextAlignment="Center"/>
+            </StackLayout>
+
+            <!-- Frame com total e botões de ação (finalizar/limpar) -->
+            <Frame Style="{StaticResource CardStyle}"
+                   Padding="20"
+                   Margin="0,8,0,16"
+                   IsVisible="{Binding CarrinhoVazio, Converter={StaticResource InvertedBoolConverter}}">
+                <StackLayout Spacing="16">
+
+                    <!-- Total do carrinho calculado automaticamente (soma dos subtotais) -->
+                    <Label Text="{Binding TotalCarrinho, StringFormat='Total: €{0:F2}'}"
+                           FontSize="28"
+                           FontAttributes="Bold"
+                           HorizontalTextAlignment="Center">
+                        <Label.TextColor>
+                            <AppThemeBinding Light="{StaticResource PriceColor}" 
+                                             Dark="{StaticResource PriceColorDark}" />
+                        </Label.TextColor>
+                    </Label>
+
+                    <!-- Botão para criar pedido e enviar para Firebase -->
+                    <Button Text="Finalizar Pedido"
+                            Command="{Binding FinalizarPedidoCommand}"
+                            Style="{StaticResource SuccessButton}"/>
+
+                    <!-- Botão para remover todos os itens do carrinho -->
+                    <Button Text="Limpar Carrinho"
+                            Command="{Binding LimparCarrinhoCommand}"
+                            Style="{StaticResource OutlineButton}"
+                            BorderColor="{StaticResource ErrorColor}"
+                            TextColor="{StaticResource ErrorColor}"/>
+
+                </StackLayout>
+            </Frame>
+
+        </StackLayout>
+    </ScrollView>
+</ContentPage>

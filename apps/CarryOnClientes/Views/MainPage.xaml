@@ -1,0 +1,312 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             xmlns:vm="clr-namespace:BarPedidos.ViewModels"
+             xmlns:models="clr-namespace:BarPedidos.Models"
+             xmlns:converters="clr-namespace:BarPedidos.Converters"
+             x:Class="BarPedidos.Views.MainPage"
+             Title="">
+
+    <ContentPage.Resources>
+        <!-- Converter que retorna true se string não estiver vazia -->
+        <!-- Usado para mostrar/ocultar botão limpar pesquisa -->
+        <converters:StringNotEmptyConverter x:Key="StringNotEmptyConverter"/>
+    </ContentPage.Resources>
+
+    <!-- Padding extra no topo para Android evitar sobreposição com barra do sistema -->
+    <ContentPage.Padding>
+        <OnPlatform x:TypeArguments="Thickness">
+            <On Platform="Android" Value="0,5,0,0" />
+        </OnPlatform>
+    </ContentPage.Padding>
+
+    <!-- Grid principal com 3 linhas: Header, Filtros, Lista -->
+    <Grid RowDefinitions="Auto,Auto,*" Padding="0">
+
+        <!-- HEADER COM BOTÃO CARRINHO E PESQUISA -->
+        <Frame Grid.Row="0" 
+               Style="{StaticResource CardStyle}"
+               Margin="16,16,16,8"
+               Padding="16">
+            <Grid RowDefinitions="Auto,Auto" RowSpacing="12">
+
+                <!-- Linha 1: Botão Carrinho com Badge -->
+                <Grid Grid.Row="0" 
+                      Padding="0,12,0,0">
+
+                    <Grid>
+                        <Button Text="Carrinho"
+                               Command="{Binding IrParaCarrinhoCommand}"
+                               Style="{StaticResource PrimaryButton}"
+                               HeightRequest="48"/>
+
+                        <!-- Badge com quantidade de itens no carrinho -->
+                        <!-- x:Name permite acesso no code-behind para animações -->
+                        <Frame x:Name="BadgeCarrinho"
+                               Padding="0"
+                               CornerRadius="14"
+                               HasShadow="True"
+                               BackgroundColor="#EF4444"
+                               BorderColor="White"
+                               WidthRequest="28"
+                               HeightRequest="28"
+                               HorizontalOptions="End"
+                               VerticalOptions="Start"
+                               Margin="0,0,-2,0">
+                            <!-- DataTrigger esconde badge quando quantidade = 0 -->
+                            <Frame.Triggers>
+                                <DataTrigger TargetType="Frame" 
+                                            Binding="{Binding QuantidadeCarrinho}" 
+                                            Value="0">
+                                    <Setter Property="IsVisible" Value="False"/>
+                                </DataTrigger>
+                            </Frame.Triggers>
+                            <Label Text="{Binding QuantidadeCarrinho}"
+                                   FontSize="13"
+                                   FontAttributes="Bold"
+                                   TextColor="White"
+                                   HorizontalOptions="Center"
+                                   VerticalOptions="Center"/>
+                        </Frame>
+                    </Grid>
+                </Grid>
+
+                <!-- Linha 2: Barra de Pesquisa -->
+                <Frame Grid.Row="1"
+                         Padding="0"
+                         CornerRadius="24"
+                         HasShadow="False"
+                         BackgroundColor="{DynamicResource PageBackground}">
+                    <Frame.BorderColor>
+                        <AppThemeBinding Light="#94A3B8" Dark="#475569"/>
+                    </Frame.BorderColor>
+                    <Grid ColumnDefinitions="Auto,*,Auto" Padding="16,8">
+
+                        <!-- Ícone de pesquisa -->
+                        <Label Grid.Column="0"
+                               Text="🔍"
+                               FontSize="20"
+                               VerticalOptions="Center"
+                               Margin="0,0,8,0"/>
+
+                        <!-- Entry ligado à propriedade TextoPesquisa -->
+                        <!-- OnTextoPesquisaChanged no ViewModel filtra automaticamente -->
+                        <Entry Grid.Column="1"
+                               Text="{Binding TextoPesquisa}"
+                               Placeholder="Pesquisar produtos..."
+                               FontSize="15"
+                               TextColor="{DynamicResource TextPrimary}"
+                               PlaceholderColor="{DynamicResource TextSecondary}"
+                               BackgroundColor="Transparent"
+                               VerticalOptions="Center"/>
+
+                        <!-- Botão limpar só aparece quando há texto (StringNotEmptyConverter) -->
+                        <Button Grid.Column="2"
+                                Text="✕"
+                                Command="{Binding LimparPesquisaCommand}"
+                                IsVisible="{Binding TextoPesquisa, Converter={StaticResource StringNotEmptyConverter}}"
+                                BackgroundColor="Transparent"
+                                TextColor="{DynamicResource TextSecondary}"
+                                FontSize="18"
+                                WidthRequest="30"
+                                HeightRequest="30"
+                                Padding="0"/>
+                    </Grid>
+                </Frame>
+
+            </Grid>
+        </Frame>
+
+        <!-- FILTROS DE CATEGORIA (scroll horizontal) -->
+        <ScrollView Grid.Row="1" 
+                    Orientation="Horizontal" 
+                    HeightRequest="50" 
+                    Margin="16,0,16,8"
+                    HorizontalScrollBarVisibility="Never">
+            <HorizontalStackLayout Spacing="8" Padding="4,0">
+
+                <!-- Cada botão usa DataTrigger para mudar estilo quando selecionado -->
+                <!-- Compara CategoriaSelecionada com o CommandParameter -->
+
+                <!-- Bebidas -->
+                <Button Text="🍺 Bebidas" 
+                        Command="{Binding FiltrarPorCategoriaCommand}" 
+                        CommandParameter="Bebidas"
+                        CornerRadius="20"
+                        Padding="18,8"
+                        FontSize="14"
+                        TextColor="{DynamicResource TextPrimary}">
+                    <Button.BackgroundColor>
+                        <AppThemeBinding Light="#F1F5F9" Dark="#334155"/>
+                    </Button.BackgroundColor>
+                    <!-- DataTrigger muda cor quando esta categoria está selecionada -->
+                    <Button.Triggers>
+                        <DataTrigger TargetType="Button" 
+                                    Binding="{Binding CategoriaSelecionada}" 
+                                    Value="Bebidas">
+                            <Setter Property="BackgroundColor" Value="{StaticResource Primary}"/>
+                            <Setter Property="TextColor" Value="White"/>
+                        </DataTrigger>
+                    </Button.Triggers>
+                </Button>
+
+                <!-- Petiscos -->
+                <Button Text="🍟 Petiscos" 
+                        Command="{Binding FiltrarPorCategoriaCommand}" 
+                        CommandParameter="Petiscos"
+                        CornerRadius="20"
+                        Padding="18,8"
+                        FontSize="14"
+                        TextColor="{DynamicResource TextPrimary}">
+                    <Button.BackgroundColor>
+                        <AppThemeBinding Light="#F1F5F9" Dark="#334155"/>
+                    </Button.BackgroundColor>
+                    <Button.Triggers>
+                        <DataTrigger TargetType="Button" 
+                                    Binding="{Binding CategoriaSelecionada}" 
+                                    Value="Petiscos">
+                            <Setter Property="BackgroundColor" Value="{StaticResource Primary}"/>
+                            <Setter Property="TextColor" Value="White"/>
+                        </DataTrigger>
+                    </Button.Triggers>
+                </Button>
+
+                <!-- Refeições -->
+                <Button Text="🍽️ Refeições" 
+                        Command="{Binding FiltrarPorCategoriaCommand}" 
+                        CommandParameter="Refeições"
+                        CornerRadius="20"
+                        Padding="18,8"
+                        FontSize="14"
+                        TextColor="{DynamicResource TextPrimary}">
+                    <Button.BackgroundColor>
+                        <AppThemeBinding Light="#F1F5F9" Dark="#334155"/>
+                    </Button.BackgroundColor>
+                    <Button.Triggers>
+                        <DataTrigger TargetType="Button" 
+                                    Binding="{Binding CategoriaSelecionada}" 
+                                    Value="Refeições">
+                            <Setter Property="BackgroundColor" Value="{StaticResource Primary}"/>
+                            <Setter Property="TextColor" Value="White"/>
+                        </DataTrigger>
+                    </Button.Triggers>
+                </Button>
+
+                <!-- Sobremesas -->
+                <Button Text="🍰 Sobremesas" 
+                        Command="{Binding FiltrarPorCategoriaCommand}" 
+                        CommandParameter="Sobremesas"
+                        CornerRadius="20"
+                        Padding="18,8"
+                        FontSize="14"
+                        TextColor="{DynamicResource TextPrimary}">
+                    <Button.BackgroundColor>
+                        <AppThemeBinding Light="#F1F5F9" Dark="#334155"/>
+                    </Button.BackgroundColor>
+                    <Button.Triggers>
+                        <DataTrigger TargetType="Button" 
+                                    Binding="{Binding CategoriaSelecionada}" 
+                                    Value="Sobremesas">
+                            <Setter Property="BackgroundColor" Value="{StaticResource Primary}"/>
+                            <Setter Property="TextColor" Value="White"/>
+                        </DataTrigger>
+                    </Button.Triggers>
+                </Button>
+
+            </HorizontalStackLayout>
+        </ScrollView>
+
+        <!-- Indicador de carregamento (aparece enquanto busca produtos do Firebase) -->
+        <ActivityIndicator Grid.Row="2"
+                          IsRunning="{Binding IsLoading}"
+                          IsVisible="{Binding IsLoading}"
+                          Color="{StaticResource Primary}"
+                          VerticalOptions="Center"
+                          HorizontalOptions="Center"
+                          WidthRequest="50"
+                          HeightRequest="50"/>
+
+        <!-- LISTA DE PRODUTOS -->
+        <!-- Só aparece quando não está a carregar (InvertedBoolConverter) -->
+        <CollectionView Grid.Row="2" 
+                       ItemsSource="{Binding ProdutosFiltrados}"
+                       BackgroundColor="Transparent"
+                       SelectionMode="None"
+                       IsVisible="{Binding IsLoading, Converter={StaticResource InvertedBoolConverter}}">
+
+            <CollectionView.ItemTemplate>
+                <DataTemplate x:DataType="models:Produto">
+                    <Frame Style="{StaticResource CardStyle}"
+                           Margin="16,8">
+
+                        <Grid RowDefinitions="Auto,Auto,Auto,Auto,Auto" RowSpacing="12">
+
+                            <!-- Imagem do produto -->
+                            <Frame Grid.Row="0"
+                                   Padding="0"
+                                   CornerRadius="12"
+                                   HeightRequest="160"
+                                   HasShadow="False"
+                                   IsClippedToBounds="True">
+                                <Image Source="{Binding ImagemUrl}"
+                                       Aspect="AspectFill"
+                                       HeightRequest="180"/>
+                            </Frame>
+
+                            <Label Grid.Row="1" 
+                                  Text="{Binding Nome}"
+                                  FontSize="20"
+                                  FontAttributes="Bold"
+                                  TextColor="{DynamicResource TextPrimary}"/>
+
+                            <Label Grid.Row="2" 
+                                  Text="{Binding Descricao}"
+                                  FontSize="15"
+                                  TextColor="{DynamicResource TextSecondary}"
+                                  LineBreakMode="WordWrap"/>
+
+                            <!-- Preço formatado (€X.XX) -->
+                            <Label Grid.Row="3" 
+                                   Text="{Binding PrecoFormatado}"
+                                   FontSize="24"
+                                   FontAttributes="Bold"
+                                   Margin="0,4,0,0">
+                                <Label.TextColor>
+                                    <AppThemeBinding Light="{StaticResource PriceColor}" 
+                                                    Dark="{StaticResource PriceColorDark}" />
+                                </Label.TextColor>
+                            </Label>
+
+                            <!-- Botão adicionar ao carrinho -->
+                            <!-- RelativeSource vai buscar Command ao ViewModel pai (MainViewModel) -->
+                            <Button Grid.Row="4"
+                                   Text="Adicionar ao Carrinho"
+                                   Command="{Binding Source={RelativeSource AncestorType={x:Type vm:MainViewModel}}, Path=AdicionarAoCarrinhoCommand}"
+                                   CommandParameter="{Binding .}"
+                                   Style="{StaticResource SecondaryButton}"
+                                   Margin="0,8,0,0"/>
+
+                        </Grid>
+                    </Frame>
+                </DataTemplate>
+            </CollectionView.ItemTemplate>
+
+            <!-- Mensagem quando não há produtos (pesquisa sem resultados) -->
+            <CollectionView.EmptyView>
+                <StackLayout Padding="40" VerticalOptions="Center" HorizontalOptions="Center">
+                    <Label Text="Nenhum produto encontrado"
+                           FontSize="18"
+                           FontAttributes="Bold"
+                           TextColor="{DynamicResource TextPrimary}"
+                           HorizontalTextAlignment="Center"/>
+                    <Label Text="Tente pesquisar por outro termo"
+                           FontSize="14"
+                           TextColor="{DynamicResource TextSecondary}"
+                           HorizontalTextAlignment="Center"
+                           Margin="0,8,0,0"/>
+                </StackLayout>
+            </CollectionView.EmptyView>
+
+        </CollectionView>
+    </Grid>
+</ContentPage>

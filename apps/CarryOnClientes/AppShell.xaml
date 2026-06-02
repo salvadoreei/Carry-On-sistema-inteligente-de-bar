@@ -1,0 +1,40 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!-- Shell: estrutura de navegação da aplicação com tabs na parte inferior -->
+<Shell
+    x:Class="BarPedidos.AppShell"
+    xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+    xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+    xmlns:views="clr-namespace:BarPedidos.Views"
+    Shell.ForegroundColor="{AppThemeBinding Light=#333333, Dark=#FFFFFF}"
+    Shell.TabBarBackgroundColor="{AppThemeBinding Light=#FFFFFF, Dark=#1C1C1E}"
+    Shell.TabBarForegroundColor="{AppThemeBinding Light=#666666, Dark=#8E8E93}"
+    Shell.TabBarTitleColor="{AppThemeBinding Light=#333333, Dark=#FFFFFF}"
+    Shell.TabBarUnselectedColor="{AppThemeBinding Light=#999999, Dark=#636366}">
+
+    <!-- TabBar: barra de navegação inferior -->
+    <TabBar>
+        <!-- Tab 1: Catálogo de produtos (página principal) -->
+        <ShellContent
+            Title="Menu"
+            ContentTemplate="{DataTemplate views:MainPage}"
+            Route="MainPage" />
+
+        <!-- Tab 2: Carrinho de compras -->
+        <ShellContent
+            Title="Carrinho"
+            ContentTemplate="{DataTemplate views:CarrinhoPage}"
+            Route="CarrinhoPage" />
+
+        <!-- Tab 3: Histórico de pedidos do cliente -->
+        <ShellContent
+            Title="Pedidos"
+            ContentTemplate="{DataTemplate views:PedidosPage}"
+            Route="PedidosPage" />
+
+        <!-- Tab 4: Definições (tema claro/escuro) -->
+        <ShellContent
+            Title="Definições"
+            ContentTemplate="{DataTemplate views:SettingsPage}"
+            Route="SettingsPage"/>
+    </TabBar>
+</Shell>

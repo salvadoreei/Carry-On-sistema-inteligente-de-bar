@@ -1,0 +1,156 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             xmlns:vm="clr-namespace:BarPedidosFuncionarios.ViewModels"
+             xmlns:converters="clr-namespace:BarPedidosFuncionarios.Converters"
+             x:Class="BarPedidosFuncionarios.Views.PedidosPage"
+             Title="">
+
+    <ContentPage.Resources>
+        <ResourceDictionary>
+            <!-- Converter que transforma StatusPedido enum em texto legível -->
+            <converters:StatusToTextConverter x:Key="StatusToTextConverter"/>
+            <!-- Converter que transforma StatusPedido enum em cor do badge -->
+            <converters:StatusToColorConverter x:Key="StatusToColorConverter"/>
+        </ResourceDictionary>
+    </ContentPage.Resources>
+
+    <!-- Padding extra no topo para Android evitar sobreposição com barra do sistema -->
+    <ContentPage.Padding>
+        <OnPlatform x:TypeArguments="Thickness">
+            <On Platform="Android" Value="0,15,0,0" />
+        </OnPlatform>
+    </ContentPage.Padding>
+
+    <!-- Grid principal com 2 linhas: Header e Lista -->
+    <Grid RowDefinitions="Auto,*" Padding="16,0,16,16" RowSpacing="16">
+
+        <!-- HEADER COM CONTADOR DE PEDIDOS ATIVOS -->
+        <Frame Grid.Row="0"
+               Style="{StaticResource CardStyle}"
+               Padding="20">
+            <StackLayout VerticalOptions="Center">
+                <Label Text="Gestão de Pedidos"
+                       FontSize="24"
+                       FontAttributes="Bold"
+                       TextColor="{DynamicResource TextPrimary}"/>
+                <!-- Contador dinâmico de pedidos ativos (exclui Pago e Cancelado) -->
+                <Label Text="{Binding TotalPedidos, StringFormat='{0} pedidos ativos'}"
+                       FontSize="14"
+                       TextColor="{DynamicResource TextSecondary}"
+                       Margin="0,2,0,0"/>
+            </StackLayout>
+        </Frame>
+
+        <!-- LISTA DE TODOS OS PEDIDOS ATIVOS -->
+        <!-- RefreshView permite ao barman puxar para baixo para atualizar -->
+        <RefreshView Grid.Row="2"
+                     Command="{Binding RefreshPedidosCommand}"
+                     IsRefreshing="{Binding IsRefreshing}"
+                     RefreshColor="{StaticResource Primary}">
+
+            <!-- CollectionView mostra TODOS os pedidos (sem filtro de DeviceId) -->
+            <CollectionView ItemsSource="{Binding PedidosFiltrados}"
+                           SelectionMode="None">
+                <CollectionView.ItemTemplate>
+                    <DataTemplate>
+                        <Frame Style="{StaticResource CardStyle}">
+                            <Grid RowDefinitions="Auto,Auto,Auto,Auto,Auto" RowSpacing="12">
+
+                                <!-- HEADER: Número da Mesa e Badge de Status -->
+                                <Grid Grid.Row="0" ColumnDefinitions="*,Auto">
+                                    <Label Grid.Column="0"
+                                          Text="{Binding NumeroMesa, StringFormat='Mesa {0}'}"
+                                          FontSize="22"
+                                          FontAttributes="Bold"
+                                          TextColor="{DynamicResource TextPrimary}"
+                                          VerticalOptions="Center"/>
+
+                                    <!-- Badge de Status com cor dinâmica -->
+                                    <!-- StatusToColorConverter: Pendente=Laranja, EmPreparacao=Azul, etc -->
+                                    <!-- StatusToTextConverter: EmPreparacao → "Em Preparação" -->
+                                    <Frame Grid.Column="1"
+                                           CornerRadius="16"
+                                           Padding="12,6"
+                                           HasShadow="False"
+                                           BorderColor="Transparent"
+                                           BackgroundColor="{Binding Status, Converter={StaticResource StatusToColorConverter}}">
+                                        <Label Text="{Binding Status, Converter={StaticResource StatusToTextConverter}}"
+                                               FontSize="13"
+                                               FontAttributes="Bold"
+                                               TextColor="White"/>
+                                    </Frame>
+                                </Grid>
+
+                                <!-- Separador visual -->
+                                <BoxView Grid.Row="1"
+                                        HeightRequest="1"
+                                        Color="{DynamicResource BorderColor}"/>
+
+                                <!-- Data e hora do pedido -->
+                                <Label Grid.Row="2"
+                                      Text="{Binding DataHora, StringFormat='{0:dd/MM/yyyy HH:mm}'}"
+                                      FontSize="15"
+                                      TextColor="{DynamicResource TextSecondary}"/>
+
+                                <!-- Total do pedido em euros -->
+                                <Label Grid.Row="3"
+                                      Text="{Binding Total, StringFormat='Total: €{0:F2}'}"
+                                      FontSize="24"
+                                      FontAttributes="Bold"
+                                      Margin="0,4,0,0">
+                                    <Label.TextColor>
+                                        <AppThemeBinding Light="{StaticResource PriceColor}" 
+                                                        Dark="{StaticResource PriceColorDark}" />
+                                    </Label.TextColor>
+                                </Label>
+
+                                <!-- Botões de ação lado a lado -->
+                                <Grid Grid.Row="4" ColumnDefinitions="*,*" ColumnSpacing="8">
+
+                                    <!-- Botão Ver Detalhes: mostra popup com itens e observações -->
+                                    <!-- RelativeSource vai buscar Command ao ViewModel pai -->
+                                    <Button Grid.Column="0"
+                                           Text="Ver Detalhes"
+                                           Command="{Binding Source={RelativeSource AncestorType={x:Type vm:PedidosViewModel}}, Path=VerDetalhesCommand}"
+                                           CommandParameter="{Binding .}"
+                                           Style="{StaticResource OutlineButton}"
+                                           HeightRequest="44"/>
+
+                                    <!-- Botão Alterar Status: abre menu com opções de status -->
+                                    <Button Grid.Column="1"
+                                           Text="Alterar Status"
+                                           Command="{Binding Source={RelativeSource AncestorType={x:Type vm:PedidosViewModel}}, Path=AlterarStatusCommand}"
+                                           CommandParameter="{Binding .}"
+                                           Style="{StaticResource PrimaryButton}"
+                                           HeightRequest="44"/>
+                                </Grid>
+                            </Grid>
+                        </Frame>
+                    </DataTemplate>
+                </CollectionView.ItemTemplate>
+
+                <!-- Mensagem quando não há pedidos ativos -->
+                <CollectionView.EmptyView>
+                    <StackLayout Padding="40" VerticalOptions="Center">
+                        <Label Text="📋"
+                              FontSize="64"
+                              HorizontalOptions="Center"
+                              Margin="0,0,0,16"/>
+                        <Label Text="Nenhum pedido ativo"
+                              FontSize="24"
+                              FontAttributes="Bold"
+                              TextColor="{DynamicResource TextPrimary}"
+                              HorizontalOptions="Center"
+                              Margin="0,0,0,8"/>
+                        <Label Text="Os pedidos dos clientes aparecerão aqui automaticamente"
+                              FontSize="16"
+                              TextColor="{DynamicResource TextSecondary}"
+                              HorizontalOptions="Center"
+                              HorizontalTextAlignment="Center"/>
+                    </StackLayout>
+                </CollectionView.EmptyView>
+            </CollectionView>
+        </RefreshView>
+    </Grid>
+</ContentPage>

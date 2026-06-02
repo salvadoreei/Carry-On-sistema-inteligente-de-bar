@@ -1,0 +1,32 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!-- Shell: estrutura de navegação da aplicação de funcionários com tabs na parte inferior -->
+<!-- Gere automaticamente a barra de navegação e transições entre páginas -->
+<!-- Cores da tab bar adaptam-se ao tema claro/escuro -->
+<Shell
+    x:Class="BarPedidosFuncionarios.AppShell"
+    xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+    xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+    xmlns:local="clr-namespace:BarPedidosFuncionarios.Views"
+    Shell.ForegroundColor="{AppThemeBinding Light=#333333, Dark=#FFFFFF}"
+    Shell.TabBarBackgroundColor="{AppThemeBinding Light=#FFFFFF, Dark=#1C1C1E}"
+    Shell.TabBarForegroundColor="{AppThemeBinding Light=#666666, Dark=#8E8E93}"
+    Shell.TabBarTitleColor="{AppThemeBinding Light=#333333, Dark=#FFFFFF}"
+    Shell.TabBarUnselectedColor="{AppThemeBinding Light=#999999, Dark=#636366}">
+
+    <!-- TabBar: barra de navegação inferior     -->
+
+    <TabBar>
+        <!-- Tab 1: Gestão de pedidos (página principal) -->
+        <!-- Mostra TODOS os pedidos ativos de todas as mesas -->
+        <ShellContent
+            Title="Pedidos"
+            ContentTemplate="{DataTemplate local:PedidosPage}"
+            Route="PedidosPage" />
+
+        <!-- Tab 2: Definições (tema claro/escuro) -->
+        <ShellContent
+            Title="Definições"
+            ContentTemplate="{DataTemplate local:SettingsPage}"
+            Route="SettingsPage" />
+    </TabBar>
+</Shell>

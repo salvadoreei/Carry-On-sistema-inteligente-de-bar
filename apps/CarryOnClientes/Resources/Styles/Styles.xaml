@@ -1,0 +1,245 @@
+﻿<?xml version="1.0" encoding="UTF-8" ?>
+<?xaml-comp compile="true" ?>
+<ResourceDictionary 
+    xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+    xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml">
+
+    <!-- ESTILO BASE PARA PÁGINAS -->
+    <Style TargetType="ContentPage" ApplyToDerivedTypes="True">
+        <Setter Property="BackgroundColor">
+            <Setter.Value>
+                <AppThemeBinding Light="{StaticResource LightBackground}" 
+                                Dark="{StaticResource DarkBackground}"/>
+            </Setter.Value>
+        </Setter>
+    </Style>
+
+    <!-- LABELS -->
+    <Style TargetType="Label">
+        <Setter Property="TextColor">
+            <Setter.Value>
+                <AppThemeBinding Light="{StaticResource LightTextPrimary}" 
+                                Dark="{StaticResource DarkTextPrimary}"/>
+            </Setter.Value>
+        </Setter>
+        <Setter Property="FontFamily" Value="OpenSansRegular"/>
+        <Setter Property="LineBreakMode" Value="WordWrap"/>
+    </Style>
+
+    <!-- FRAMES/CARDS -->
+    <Style TargetType="Frame" x:Key="CardStyle">
+        <Setter Property="BackgroundColor">
+            <Setter.Value>
+                <AppThemeBinding Light="{StaticResource LightCardBackground}" 
+                                Dark="{StaticResource DarkCardBackground}"/>
+            </Setter.Value>
+        </Setter>
+        <Setter Property="BorderColor">
+            <Setter.Value>
+                <AppThemeBinding Light="{StaticResource LightBorder}" 
+                                Dark="{StaticResource DarkBorder}"/>
+            </Setter.Value>
+        </Setter>
+        <Setter Property="HasShadow" Value="True"/>
+        <Setter Property="Padding" Value="16"/>
+        <Setter Property="CornerRadius" Value="16"/>
+        <Setter Property="Margin" Value="8,4"/>
+    </Style>
+
+    <!-- BOTÃO PRIMARY -->
+    <Style TargetType="Button" x:Key="PrimaryButton">
+        <Setter Property="BackgroundColor" Value="{StaticResource Primary}"/>
+        <Setter Property="TextColor" Value="White"/>
+        <Setter Property="FontFamily" Value="OpenSansSemibold"/>
+        <Setter Property="FontSize" Value="16"/>
+        <Setter Property="CornerRadius" Value="12"/>
+        <Setter Property="Padding" Value="20,14"/>
+        <Setter Property="HeightRequest" Value="54"/>
+        <Setter Property="Shadow">
+            <Shadow Brush="{StaticResource Primary}" Opacity="0.3" Radius="8" Offset="0,4"/>
+        </Setter>
+        <Setter Property="VisualStateManager.VisualStateGroups">
+            <VisualStateGroupList>
+                <VisualStateGroup x:Name="CommonStates">
+                    <VisualState x:Name="Normal">
+                        <VisualState.Setters>
+                            <Setter Property="Scale" Value="1" />
+                            <Setter Property="Opacity" Value="1" />
+                        </VisualState.Setters>
+                    </VisualState>
+                    <VisualState x:Name="Pressed">
+                        <VisualState.Setters>
+                            <Setter Property="Scale" Value="0.95" />
+                            <Setter Property="Opacity" Value="0.8" />
+                        </VisualState.Setters>
+                    </VisualState>
+                </VisualStateGroup>
+            </VisualStateGroupList>
+        </Setter>
+    </Style>
+
+    <!-- BOTÃO SECONDARY -->
+    <Style TargetType="Button" x:Key="SecondaryButton">
+        <Setter Property="BackgroundColor" Value="{StaticResource Secondary}"/>
+        <Setter Property="TextColor" Value="White"/>
+        <Setter Property="FontFamily" Value="OpenSansSemibold"/>
+        <Setter Property="FontSize" Value="16"/>
+        <Setter Property="CornerRadius" Value="12"/>
+        <Setter Property="Padding" Value="20,14"/>
+        <Setter Property="HeightRequest" Value="54"/>
+        <Setter Property="VisualStateManager.VisualStateGroups">
+            <VisualStateGroupList>
+                <VisualStateGroup x:Name="CommonStates">
+                    <VisualState x:Name="Normal">
+                        <VisualState.Setters>
+                            <Setter Property="Scale" Value="1" />
+                            <Setter Property="Opacity" Value="1" />
+                        </VisualState.Setters>
+                    </VisualState>
+                    <VisualState x:Name="Pressed">
+                        <VisualState.Setters>
+                            <Setter Property="Scale" Value="0.95" />
+                            <Setter Property="Opacity" Value="0.8" />
+                        </VisualState.Setters>
+                    </VisualState>
+                </VisualStateGroup>
+            </VisualStateGroupList>
+        </Setter>
+    </Style>
+
+    <!-- BOTÃO SUCCESS -->
+    <Style TargetType="Button" x:Key="SuccessButton">
+        <Setter Property="BackgroundColor" Value="{StaticResource SuccessColor}"/>
+        <Setter Property="TextColor" Value="White"/>
+        <Setter Property="FontFamily" Value="OpenSansSemibold"/>
+        <Setter Property="FontSize" Value="16"/>
+        <Setter Property="CornerRadius" Value="12"/>
+        <Setter Property="Padding" Value="20,14"/>
+        <Setter Property="HeightRequest" Value="54"/>
+        <Setter Property="VisualStateManager.VisualStateGroups">
+            <VisualStateGroupList>
+                <VisualStateGroup x:Name="CommonStates">
+                    <VisualState x:Name="Normal">
+                        <VisualState.Setters>
+                            <Setter Property="Scale" Value="1" />
+                            <Setter Property="Opacity" Value="1" />
+                        </VisualState.Setters>
+                    </VisualState>
+                    <VisualState x:Name="Pressed">
+                        <VisualState.Setters>
+                            <Setter Property="Scale" Value="0.95" />
+                            <Setter Property="Opacity" Value="0.8" />
+                        </VisualState.Setters>
+                    </VisualState>
+                </VisualStateGroup>
+            </VisualStateGroupList>
+        </Setter>
+    </Style>
+
+    <!-- BOTÃO DANGER -->
+    <Style TargetType="Button" x:Key="DangerButton">
+        <Setter Property="BackgroundColor" Value="{StaticResource ErrorColor}"/>
+        <Setter Property="TextColor" Value="White"/>
+        <Setter Property="FontFamily" Value="OpenSansSemibold"/>
+        <Setter Property="FontSize" Value="14"/>
+        <Setter Property="CornerRadius" Value="10"/>
+        <Setter Property="Padding" Value="16,10"/>
+        <Setter Property="VisualStateManager.VisualStateGroups">
+            <VisualStateGroupList>
+                <VisualStateGroup x:Name="CommonStates">
+                    <VisualState x:Name="Normal">
+                        <VisualState.Setters>
+                            <Setter Property="Scale" Value="1" />
+                            <Setter Property="Opacity" Value="1" />
+                        </VisualState.Setters>
+                    </VisualState>
+                    <VisualState x:Name="Pressed">
+                        <VisualState.Setters>
+                            <Setter Property="Scale" Value="0.95" />
+                            <Setter Property="Opacity" Value="0.8" />
+                        </VisualState.Setters>
+                    </VisualState>
+                </VisualStateGroup>
+            </VisualStateGroupList>
+        </Setter>
+    </Style>
+
+    <!-- BOTÃO OUTLINE -->
+    <Style TargetType="Button" x:Key="OutlineButton">
+        <Setter Property="BackgroundColor" Value="Transparent"/>
+        <Setter Property="TextColor" Value="{StaticResource Primary}"/>
+        <Setter Property="BorderColor" Value="{StaticResource Primary}"/>
+        <Setter Property="BorderWidth" Value="2"/>
+        <Setter Property="FontFamily" Value="OpenSansSemibold"/>
+        <Setter Property="FontSize" Value="16"/>
+        <Setter Property="CornerRadius" Value="12"/>
+        <Setter Property="Padding" Value="20,14"/>
+        <Setter Property="VisualStateManager.VisualStateGroups">
+            <VisualStateGroupList>
+                <VisualStateGroup x:Name="CommonStates">
+                    <VisualState x:Name="Normal">
+                        <VisualState.Setters>
+                            <Setter Property="Scale" Value="1" />
+                            <Setter Property="Opacity" Value="1" />
+                        </VisualState.Setters>
+                    </VisualState>
+                    <VisualState x:Name="Pressed">
+                        <VisualState.Setters>
+                            <Setter Property="Scale" Value="0.95" />
+                            <Setter Property="Opacity" Value="0.7" />
+                        </VisualState.Setters>
+                    </VisualState>
+                </VisualStateGroup>
+            </VisualStateGroupList>
+        </Setter>
+    </Style>
+
+    <!-- ENTRY -->
+    <Style TargetType="Entry">
+        <Setter Property="TextColor">
+            <Setter.Value>
+                <AppThemeBinding Light="{StaticResource LightTextPrimary}" 
+                                Dark="{StaticResource DarkTextPrimary}"/>
+            </Setter.Value>
+        </Setter>
+        <Setter Property="BackgroundColor">
+            <Setter.Value>
+                <AppThemeBinding Light="{StaticResource LightCardBackground}" 
+                                Dark="{StaticResource DarkCardBackground}"/>
+            </Setter.Value>
+        </Setter>
+        <Setter Property="PlaceholderColor">
+            <Setter.Value>
+                <AppThemeBinding Light="{StaticResource LightTextSecondary}" 
+                                Dark="{StaticResource DarkTextSecondary}"/>
+            </Setter.Value>
+        </Setter>
+        <Setter Property="FontSize" Value="16"/>
+        <Setter Property="HeightRequest" Value="50"/>
+        <Setter Property="Margin" Value="0,4"/>
+    </Style>
+
+    <!-- EDITOR -->
+    <Style TargetType="Editor">
+        <Setter Property="TextColor">
+            <Setter.Value>
+                <AppThemeBinding Light="{StaticResource LightTextPrimary}" 
+                                Dark="{StaticResource DarkTextPrimary}"/>
+            </Setter.Value>
+        </Setter>
+        <Setter Property="BackgroundColor">
+            <Setter.Value>
+                <AppThemeBinding Light="{StaticResource LightCardBackground}" 
+                                Dark="{StaticResource DarkCardBackground}"/>
+            </Setter.Value>
+        </Setter>
+        <Setter Property="PlaceholderColor">
+            <Setter.Value>
+                <AppThemeBinding Light="{StaticResource LightTextSecondary}" 
+                                Dark="{StaticResource DarkTextSecondary}"/>
+            </Setter.Value>
+        </Setter>
+        <Setter Property="FontSize" Value="16"/>
+    </Style>
+
+</ResourceDictionary>

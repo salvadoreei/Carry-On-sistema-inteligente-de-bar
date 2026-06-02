@@ -1,0 +1,47 @@
+﻿<?xml version="1.0" encoding="UTF-8" ?>
+<?xaml-comp compile="true" ?>
+<ResourceDictionary 
+    xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+    xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml">
+
+    <!-- CORES BASE MODERNAS -->
+    <Color x:Key="Primary">#6366F1</Color>
+    <Color x:Key="PrimaryDark">#4F46E5</Color>
+    <Color x:Key="Secondary">#4F46E5</Color>
+    <Color x:Key="SecondaryLight">#F9A8D4</Color>
+    <Color x:Key="Accent">#8B5CF6</Color>
+
+    <!-- MODO CLARO -->
+    <Color x:Key="LightBackground">#F8FAFC</Color>
+    <Color x:Key="LightSurface">#FFFFFF</Color>
+    <Color x:Key="LightCardBackground">#FFFFFF</Color>
+    <Color x:Key="LightTextPrimary">#1E293B</Color>
+    <Color x:Key="LightTextSecondary">#64748B</Color>
+    <Color x:Key="LightBorder">#94A3B8</Color>
+
+    <!-- MODO ESCURO -->
+    <Color x:Key="DarkBackground">#0F172A</Color>
+    <Color x:Key="DarkSurface">#1E293B</Color>
+    <Color x:Key="DarkCardBackground">#1E293B</Color>
+    <Color x:Key="DarkTextPrimary">#F1F5F9</Color>
+    <Color x:Key="DarkTextSecondary">#94A3B8</Color>
+    <Color x:Key="DarkBorder">#475569</Color>
+
+    <!-- CORES ESPECIAIS -->
+    <Color x:Key="SuccessColor">#10B981</Color>
+    <Color x:Key="SuccessLight">#D1FAE5</Color>
+    <Color x:Key="WarningColor">#F59E0B</Color>
+    <Color x:Key="ErrorColor">#EF4444</Color>
+    <Color x:Key="InfoColor">#3B82F6</Color>
+
+    <!-- Preço -->
+    <Color x:Key="PriceColor">#059669</Color>
+    <Color x:Key="PriceColorDark">#34D399</Color>
+
+    <!-- SWITCH  -->
+    <Color x:Key="SwitchThumbOn">#FFFFFF</Color>
+    <Color x:Key="SwitchThumbOff">#334155</Color>
+    <Color x:Key="SwitchTrackOn">#6366F1</Color>
+    <Color x:Key="SwitchTrackOff">#94A3B8</Color>
+
+</ResourceDictionary>
