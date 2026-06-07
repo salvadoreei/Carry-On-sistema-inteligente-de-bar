@@ -5,7 +5,7 @@
 
 // --- CONFIGURAÇÃO DE PINOS ---
 #define RECV_PIN 11
-#define LIMIAR 550
+#define LIMIAR 500
 #define RST_PIN 48
 #define SS_PIN 53
 #define SWITCH_PIN 22 
@@ -15,12 +15,17 @@
 // --- PARÂMETROS DO SISTEMA ---
 #define DISTANCIA_LIMITE 15 
 const int passosPorVolta = 2048;
-const int fatorCompensacao = 4; 
+
+// --- PARÂMETROS DE RECUPERAÇÃO DE LINHA ---
+char ultimoMovimento = 'F'; 
+int contadorPerdido = 0;
+const int MAX_TENTATIVAS_RECUPERACAO = 150; 
 
 // --- CÓDIGOS DO COMANDO IR (Substituir pelos teus valores) ---
 #define BOTAO_MESA1   0x45 
 #define BOTAO_MESA2   0x46 
 #define BOTAO_BALCAO  0x47 
+#define BOTAO_ZERO    0x16 // Substituir pelo código do botão 0
 
 // --- ESTADOS DO SISTEMA ---
 enum EstadoRobo { AGUARDAR_COMANDO, IDA_MESA, REGRESSO_BALCAO };
@@ -66,6 +71,7 @@ void loop() {
   processarComandoIR();
 
   // O Microswitch bloqueia o movimento APENAS durante a viagem de ida para a mesa
+  // e enquanto não houver peso no chassis
   if (estadoAtual == IDA_MESA && digitalRead(SWITCH_PIN) == HIGH) {
     pararMotores();
     return; 
@@ -79,11 +85,8 @@ void loop() {
       break;
 
     case IDA_MESA:
-      executarMovimento();
-      break;
-
     case REGRESSO_BALCAO:
-      executarMovimento(); 
+      executarMovimento();
       break;
   }
 }
@@ -91,19 +94,30 @@ void loop() {
 // --- FUNÇÕES DE CONTROLO PRINCIPAL ---
 
 void processarComandoIR() {
-  if (estadoAtual == AGUARDAR_COMANDO && IrReceiver.decode()) {
+  // A leitura do recetor ocorre em permanência em qualquer estado
+  if (IrReceiver.decode()) {
     unsigned long comando = IrReceiver.decodedIRData.command;
     
-    if (comando == BOTAO_MESA1) {
-      destinoAtual = MESA_1;
-      estadoAtual = IDA_MESA;
-      Serial.println("-> MODO MESA 1 ATIVADO");
-    } 
-    else if (comando == BOTAO_MESA2) {
-      destinoAtual = MESA_2;
-      estadoAtual = IDA_MESA;
-      Serial.println("-> MODO MESA 2 ATIVADO");
-    } 
+    // Paragem de Emergência/Forçada - Interrompe o robô em qualquer momento
+    if (comando == BOTAO_ZERO) {
+      estadoAtual = AGUARDAR_COMANDO;
+      destinoAtual = NENHUM;
+      pararMotores();
+      Serial.println("-> PARAGEM FORCADA ATIVADA (BOTAO 0)");
+    }
+    // Definição de destino - Apenas válida se estiver no balcão ou sem carga
+    else if (estadoAtual == AGUARDAR_COMANDO || (estadoAtual == IDA_MESA && digitalRead(SWITCH_PIN) == HIGH)) {
+      if (comando == BOTAO_MESA1) {
+        destinoAtual = MESA_1;
+        estadoAtual = IDA_MESA;
+        Serial.println("-> MODO MESA 1 ATIVADO");
+      } 
+      else if (comando == BOTAO_MESA2) {
+        destinoAtual = MESA_2;
+        estadoAtual = IDA_MESA;
+        Serial.println("-> MODO MESA 2 ATIVADO");
+      }
+    }
     
     IrReceiver.resume();
   }
@@ -129,11 +143,20 @@ void executarMovimento() {
   // Bloqueio
   if (estadoAtual == AGUARDAR_COMANDO) return;
 
-  // 3. Execução de Rota
+  // 3. Execução de Rota com Memória de Recuperação
   if (verificarPresencaLinha()) {
+    contadorPerdido = 0; 
     seguirLinha();
   } else {
-    pararMotores(); 
+    // Tenta regressar à linha baseando-se no último movimento registado
+    if (contadorPerdido < MAX_TENTATIVAS_RECUPERACAO) {
+      contadorPerdido++;
+      if (ultimoMovimento == 'E') esquerda();
+      else if (ultimoMovimento == 'D') direita();
+      else frente();
+    } else {
+      pararMotores(); 
+    }
   }
 }
 
@@ -212,30 +235,24 @@ void seguirLinha() {
   int s3 = analogRead(A3);
   int s4 = analogRead(A4);
 
-  // Se o sensor do meio OU os sensores imediatamente ao lado virem a linha, vai em frente
+  // Regista a última ação para a memória de recuperação
   if (s2 < LIMIAR || (s1 < LIMIAR && s3 < LIMIAR)) { 
     frente(); 
+    ultimoMovimento = 'F';
   } 
-  // Só vira para a esquerda se a linha fugir muito para esse lado
   else if (s1 < LIMIAR || s0 < LIMIAR) { 
     esquerda(); 
+    ultimoMovimento = 'E';
   } 
-  // Só vira para a direita se a linha fugir muito para esse lado
   else if (s3 < LIMIAR || s4 < LIMIAR) { 
     direita(); 
+    ultimoMovimento = 'D';
   }
 }
 
 void frente() {
-  static int contadorComp = 0;
   motorEsq.step(1); 
   motorDir.step(-1); 
-  
-  contadorComp++;
-  if (contadorComp >= fatorCompensacao) { 
-    motorDir.step(-1); 
-    contadorComp = 0; 
-  }
 }
 
 void esquerda() {
